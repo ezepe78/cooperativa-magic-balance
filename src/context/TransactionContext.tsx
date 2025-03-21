@@ -30,6 +30,7 @@ interface TransactionContextType {
   categories: Category[];
   initialBalances: Record<TreasuryAccount, number>;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
+  editTransaction: (id: string, data: Partial<Omit<Transaction, 'id'>>) => void;
   addCategory: (category: Omit<Category, 'id'>) => void;
   updateCategory: (id: string, data: Partial<Omit<Category, 'id'>>) => void;
   deleteCategory: (id: string) => void;
@@ -136,6 +137,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     toast.success('Transacción agregada correctamente');
   };
 
+  const editTransaction = (id: string, data: Partial<Omit<Transaction, 'id'>>) => {
+    setTransactions(
+      transactions.map(transaction =>
+        transaction.id === id ? { ...transaction, ...data } : transaction
+      )
+    );
+    toast.success('Transacción actualizada correctamente');
+  };
+
   const deleteTransaction = (id: string) => {
     setTransactions(transactions.filter(t => t.id !== id));
     toast.success('Transacción eliminada correctamente');
@@ -221,6 +231,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     categories,
     initialBalances,
     addTransaction,
+    editTransaction,
     addCategory,
     updateCategory,
     deleteCategory,

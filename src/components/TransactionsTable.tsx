@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Transaction, useTransactions, Category, TransactionType } from '@/context/TransactionContext';
 import { formatCurrency, formatDate } from '@/utils/formatters';
+import { useNavigate } from 'react-router-dom';
 import {
   Table,
   TableBody,
@@ -19,18 +20,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowDownIcon, ArrowUpIcon, FilterIcon, MoreHorizontal, SearchIcon, Trash2 } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, FilterIcon, MoreHorizontal, PencilIcon, SearchIcon, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const TransactionsTable = () => {
   const { transactions, categories, deleteTransaction } = useTransactions();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<TransactionType | 'all'>('all');
+  const navigate = useNavigate();
   
   // Function to get category name by id
   const getCategoryName = (categoryId: string): string => {
     const category = categories.find(c => c.id === categoryId);
     return category ? category.name : 'Desconocida';
+  };
+  
+  // Navigate to edit transaction screen
+  const handleEditTransaction = (transactionId: string) => {
+    navigate(`/edit-transaction/${transactionId}`);
   };
   
   // Filter transactions
@@ -157,6 +164,13 @@ const TransactionsTable = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem 
+                          onClick={() => handleEditTransaction(transaction.id)}
+                          className="text-blue-600"
+                        >
+                          <PencilIcon className="mr-2 h-4 w-4" />
+                          Editar
+                        </DropdownMenuItem>
                         <DropdownMenuItem 
                           className="text-destructive"
                           onClick={() => deleteTransaction(transaction.id)}

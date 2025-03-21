@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import AddTransaction from "./pages/AddTransaction";
+import EditTransaction from "./pages/EditTransaction";
 import ManageCategories from "./pages/ManageCategories";
 import NotFound from "./pages/NotFound";
 
@@ -20,6 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/add-transaction" element={<AddTransaction />} />
+          <Route path="/edit-transaction/:id" element={<EditTransaction />} />
           <Route path="/manage-categories" element={<ManageCategories />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
