@@ -18,7 +18,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between">
         <div className="flex items-center mb-4 sm:mb-0">
           <PieChart className="h-6 w-6 mr-2 text-primary" />
-          <h1 className="text-xl font-semibold tracking-tight">Cooperativa Escolar</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Cooperadora escolar JI 902</h1>
         </div>
         
         <nav className="flex items-center space-x-1">
