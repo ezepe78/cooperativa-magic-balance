@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTransactions, TransactionType, TreasuryAccount } from '@/context/TransactionContext';
+import { useTransactions, TransactionType, TreasuryAccount, TransactionProvider } from '@/context/TransactionContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { isValidCheckNumber, isValidVendorName, isValidAmount, isValidDate } from '@/utils/validators';
 import Navbar from '@/components/Navbar';
 
-const EditTransaction = () => {
+const EditTransactionContent = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { transactions, categories, editTransaction } = useTransactions();
@@ -337,6 +337,15 @@ const EditTransaction = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+// Wrapper component that provides the TransactionContext
+const EditTransaction = () => {
+  return (
+    <TransactionProvider>
+      <EditTransactionContent />
+    </TransactionProvider>
   );
 };
 
