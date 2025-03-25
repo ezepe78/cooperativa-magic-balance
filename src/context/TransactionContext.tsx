@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,9 +22,10 @@ export interface Transaction {
   amount: number;
   date: string;
   description: string;
-  vendor?: string;
+  supplier?: string;
   check_number?: string;
   receipt?: string;
+  person_name?: string;
   created_at?: string;
 }
 
@@ -118,9 +118,10 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
           amount: Number(trans.amount),
           date: trans.date,
           description: trans.description,
-          vendor: trans.vendor,
+          supplier: trans.supplier,
           check_number: trans.check_number,
           receipt: trans.receipt,
+          person_name: trans.person_name,
           created_at: trans.created_at
         }));
 
@@ -155,9 +156,17 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 
   const addTransaction = async (transaction: Omit<Transaction, 'id'>) => {
     try {
+      // Renamed vendor to supplier to match Supabase schema
+      const { supplier, ...rest } = transaction as any;
+      
+      const transactionData = {
+        ...rest,
+        supplier: supplier || null
+      };
+      
       const { data, error } = await supabase
         .from('transactions')
-        .insert([transaction])
+        .insert([transactionData])
         .select()
         .single();
 
@@ -172,9 +181,10 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         amount: Number(data.amount),
         date: data.date,
         description: data.description,
-        vendor: data.vendor,
+        supplier: data.supplier,
         check_number: data.check_number,
         receipt: data.receipt,
+        person_name: data.person_name,
         created_at: data.created_at
       };
 
@@ -188,9 +198,17 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 
   const editTransaction = async (id: string, data: Partial<Omit<Transaction, 'id'>>) => {
     try {
+      // Handle vendor to supplier mapping if present
+      const { vendor, ...restData } = data as any;
+      
+      const updateData = {
+        ...restData,
+        ...(vendor !== undefined ? { supplier: vendor } : {})
+      };
+      
       const { error } = await supabase
         .from('transactions')
-        .update(data)
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;

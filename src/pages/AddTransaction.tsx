@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransactions, TransactionType, TreasuryAccount, Category } from '@/context/TransactionContext';
@@ -26,7 +27,8 @@ const AddTransaction = () => {
   const [amount, setAmount] = useState<number>(0);
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState<string>('');
-  const [vendor, setVendor] = useState<string>('');
+  // Changed vendor to supplier to match database schema
+  const [supplier, setSupplier] = useState<string>('');
   const [checkNumber, setCheckNumber] = useState<string>('');
   const [receipt, setReceipt] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,13 +45,13 @@ const AddTransaction = () => {
       await addTransaction({
         type: type,
         account: account,
-        category_id: category, // Use category as category_id
+        category_id: category,
         amount: amount,
         date: date,
         description: description,
-        vendor: vendor,
-        check_number: checkNumber,
-        receipt: receipt
+        supplier: supplier || undefined,
+        check_number: checkNumber || undefined,
+        receipt: receipt || undefined
       });
       
       // Reset form
@@ -59,7 +61,7 @@ const AddTransaction = () => {
       setAmount(0);
       setDate(new Date().toISOString().split('T')[0]);
       setDescription('');
-      setVendor('');
+      setSupplier('');
       setCheckNumber('');
       setReceipt('');
       
@@ -183,13 +185,13 @@ const AddTransaction = () => {
               </div>
               
               <div>
-                <Label htmlFor="vendor">Proveedor (Opcional)</Label>
+                <Label htmlFor="supplier">Proveedor (Opcional)</Label>
                 <Input
                   type="text"
-                  id="vendor"
+                  id="supplier"
                   placeholder="Nombre del proveedor"
-                  value={vendor}
-                  onChange={(e) => setVendor(e.target.value)}
+                  value={supplier}
+                  onChange={(e) => setSupplier(e.target.value)}
                 />
               </div>
               

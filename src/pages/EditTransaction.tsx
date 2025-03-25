@@ -26,7 +26,7 @@ const EditTransactionContent = () => {
   const [type, setType] = useState<TransactionType>('income');
   const [account, setAccount] = useState<TreasuryAccount>('cash');
   const [category, setCategory] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState<string>('');
   const [description, setDescription] = useState('');
   const [vendor, setVendor] = useState('');
   const [checkNumber, setCheckNumber] = useState('');
@@ -43,10 +43,10 @@ const EditTransactionContent = () => {
         setType(transaction.type);
         setAccount(transaction.account);
         setCategory(transaction.category_id);
-        setAmount(transaction.amount);
-        setDate(transaction.date);
+        setAmount(String(transaction.amount));
+        setDate(new Date(transaction.date));
         setDescription(transaction.description);
-        setVendor(transaction.vendor || '');
+        setVendor(transaction.supplier || '');
         setCheckNumber(transaction.check_number || '');
         setReceipt(transaction.receipt || '');
         setIsLoading(false);
@@ -110,14 +110,16 @@ const EditTransactionContent = () => {
     
     try {
       if (id) {
+        const formattedDate = date.toISOString().split('T')[0];
+        
         await editTransaction(id, {
           type,
           account,
           category_id: category,
-          amount,
-          date,
+          amount: parseFloat(amount),
+          date: formattedDate,
           description,
-          vendor: vendor || undefined,
+          supplier: vendor || undefined,
           check_number: checkNumber || undefined,
           receipt: receipt || undefined,
         });
