@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TransactionProvider, useTransactions, TransactionType, TreasuryAccount } from '@/context/TransactionContext';
@@ -40,14 +39,12 @@ import { es } from 'date-fns/locale';
 const accountOptions = [
   { value: 'cash', label: 'Efectivo' },
   { value: 'banco_provincia', label: 'Banco Provincia' },
-  { value: 'other', label: 'Otras Cuentas' },
 ];
 
 const AddTransactionContent = () => {
   const navigate = useNavigate();
   const { addTransaction, categories } = useTransactions();
   
-  // Form state
   const [type, setType] = useState<TransactionType>('income');
   const [account, setAccount] = useState<TreasuryAccount>('cash');
   const [category, setCategory] = useState('');
@@ -57,43 +54,33 @@ const AddTransactionContent = () => {
   const [vendor, setVendor] = useState('');
   const [checkNumber, setCheckNumber] = useState('');
   
-  // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  // Filter categories based on transaction type
   const filteredCategories = categories.filter(c => c.type === type);
   
-  // Set default category when filtered categories change
   useEffect(() => {
     if (filteredCategories.length > 0 && !filteredCategories.some(c => c.id === category)) {
       setCategory(filteredCategories[0].id);
     }
   }, [filteredCategories, category]);
   
-  // Determine if check number field should be visible
   const showCheckNumber = type === 'expense' && account === 'banco_provincia';
   
-  // Determine if vendor field should be visible
   const showVendor = type === 'expense';
   
-  // Handle check number blur to pad with zeros
   const handleCheckNumberBlur = () => {
     if (checkNumber) {
       setCheckNumber(padCheckNumber(checkNumber));
     }
   };
 
-  // Count characters for vendor name
   const vendorCharCount = vendor.length;
   
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Reset errors
     setErrors({});
     
-    // Validate form
     const validationErrors: Record<string, string> = {};
     
     if (!category) {
@@ -124,13 +111,11 @@ const AddTransactionContent = () => {
       validationErrors.date = 'Seleccione una fecha válida';
     }
     
-    // If there are errors, display them and stop submission
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
     
-    // Create transaction object
     const transaction = {
       type,
       account,
@@ -142,7 +127,6 @@ const AddTransactionContent = () => {
       checkNumber: showCheckNumber ? checkNumber : undefined,
     };
     
-    // Add transaction and navigate back to dashboard
     addTransaction(transaction);
     navigate('/');
   };

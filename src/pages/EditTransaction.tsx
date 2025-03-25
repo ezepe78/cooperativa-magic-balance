@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTransactions, TransactionType, TreasuryAccount, TransactionProvider } from '@/context/TransactionContext';
@@ -34,7 +33,6 @@ const EditTransactionContent = () => {
   const [date, setDate] = useState<Date>(new Date());
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
-  // Load transaction data
   useEffect(() => {
     const transaction = transactions.find(t => t.id === id);
     if (transaction) {
@@ -47,29 +45,24 @@ const EditTransactionContent = () => {
       setCheckNumber(transaction.checkNumber || '');
       setDate(new Date(transaction.date));
     } else {
-      // Redirect if transaction not found
       navigate('/');
     }
   }, [id, transactions, navigate]);
   
-  // Filter categories based on transaction type
   const filteredCategories = categories.filter(c => c.type === transactionType);
 
-  // Format check number by padding with zeros
   const formatCheckNumber = (value: string) => {
     if (!value) return '';
     const numberOnly = value.replace(/\D/g, '');
     return numberOnly.padStart(8, '0');
   };
 
-  // Handle check number blur
   const handleCheckNumberBlur = () => {
     if (checkNumber) {
       setCheckNumber(formatCheckNumber(checkNumber));
     }
   };
 
-  // Validate form
   const validateForm = () => {
     const errors: Record<string, string> = {};
     
@@ -106,7 +99,6 @@ const EditTransactionContent = () => {
     return Object.keys(errors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -160,7 +152,6 @@ const EditTransactionContent = () => {
                       value={transactionType}
                       onValueChange={(value) => {
                         setTransactionType(value as TransactionType);
-                        // Reset category when type changes
                         setCategory('');
                       }}
                       className="flex space-x-4 pt-2"
@@ -189,7 +180,6 @@ const EditTransactionContent = () => {
                         <SelectContent>
                           <SelectItem value="cash">Efectivo</SelectItem>
                           <SelectItem value="banco_provincia">Banco Provincia</SelectItem>
-                          <SelectItem value="other">Otras Cuentas</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -340,7 +330,6 @@ const EditTransactionContent = () => {
   );
 };
 
-// Wrapper component that provides the TransactionContext
 const EditTransaction = () => {
   return (
     <TransactionProvider>

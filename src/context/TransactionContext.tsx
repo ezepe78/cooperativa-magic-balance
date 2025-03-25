@@ -1,10 +1,10 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define types
 export type TransactionType = 'income' | 'expense';
-export type TreasuryAccount = 'cash' | 'banco_provincia' | 'other';
+export type TreasuryAccount = 'cash' | 'banco_provincia';
 
 export interface Category {
   id: string;
@@ -107,7 +107,6 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const [initialBalances, setInitialBalances] = useState({
     cash: 50000,
     banco_provincia: 100000,
-    other: 0,
   });
 
   // Save to local storage whenever state changes
@@ -196,8 +195,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
   const getTotalBalance = (): number => {
     return (
       getBalance('cash') + 
-      getBalance('banco_provincia') + 
-      getBalance('other')
+      getBalance('banco_provincia')
     );
   };
 

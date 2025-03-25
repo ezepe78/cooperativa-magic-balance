@@ -3,7 +3,8 @@ import React from 'react';
 import { useTransactions, TreasuryAccount } from '@/context/TransactionContext';
 import { formatCurrency } from '@/utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Banknote, Building2, CircleDollarSign } from 'lucide-react';
+import { Banknote, Building2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const BalanceSummary = () => {
   const { getBalance, getTotalBalance } = useTransactions();
@@ -20,20 +21,14 @@ const BalanceSummary = () => {
       name: 'Banco Provincia', 
       icon: Building2,
       iconColor: 'text-blue-500'
-    },
-    { 
-      id: 'other' as TreasuryAccount, 
-      name: 'Otras Cuentas', 
-      icon: CircleDollarSign,
-      iconColor: 'text-gray-500'
-    },
+    }
   ];
 
   const totalBalance = getTotalBalance();
   const isNegative = totalBalance < 0;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
       {accounts.map((account) => {
         const balance = getBalance(account.id);
         const Icon = account.icon;
@@ -55,7 +50,7 @@ const BalanceSummary = () => {
         );
       })}
       
-      <div className="md:col-span-3">
+      <div className="md:col-span-2">
         <Card className={cn(
           "overflow-hidden border-t-4 card-hover",
           isNegative ? "border-destructive" : "border-success"
@@ -79,7 +74,5 @@ const BalanceSummary = () => {
     </div>
   );
 };
-
-import { cn } from '@/lib/utils';
 
 export default BalanceSummary;
