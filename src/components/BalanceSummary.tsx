@@ -3,11 +3,11 @@ import React from 'react';
 import { useTransactions, TreasuryAccount } from '@/context/TransactionContext';
 import { formatCurrency } from '@/utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Banknote, Building2 } from 'lucide-react';
+import { Banknote, Building2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const BalanceSummary = () => {
-  const { getBalance, getTotalBalance } = useTransactions();
+  const { getBalance, getTotalBalance, isLoading } = useTransactions();
 
   const accounts = [
     { 
@@ -23,6 +23,35 @@ const BalanceSummary = () => {
       iconColor: 'text-blue-500'
     }
   ];
+  
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+        {accounts.map((account) => (
+          <Card key={account.id} className="overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
+              <account.icon className={`h-5 w-5 ${account.iconColor}`} />
+            </CardHeader>
+            <CardContent className="flex items-center justify-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </CardContent>
+          </Card>
+        ))}
+        
+        <div className="md:col-span-2">
+          <Card className="overflow-hidden border-t-4 border-muted">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Saldo Total</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const totalBalance = getTotalBalance();
   const isNegative = totalBalance < 0;

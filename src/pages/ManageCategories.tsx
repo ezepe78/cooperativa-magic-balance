@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TransactionProvider, useTransactions, TransactionType } from '@/context/TransactionContext';
 import Navbar from '@/components/Navbar';
@@ -26,21 +25,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, Trash2 } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, Trash2, Loader2 } from 'lucide-react';
 
 const ManageCategoriesContent = () => {
-  const { categories, addCategory, updateCategory, deleteCategory } = useTransactions();
+  const { categories, addCategory, updateCategory, deleteCategory, isLoading } = useTransactions();
   
   const [activeTab, setActiveTab] = useState<TransactionType>('income');
   const [newCategoryName, setNewCategoryName] = useState('');
   const [editingCategory, setEditingCategory] = useState<{ id: string, name: string } | null>(null);
   const [formError, setFormError] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   
   // Filter categories based on the active tab
   const filteredCategories = categories.filter(category => category.type === activeTab);
   
   // Handle adding a new category
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (!newCategoryName.trim()) {
       setFormError('Ingrese un nombre de categoría válido');
       return;
@@ -56,17 +58,19 @@ const ManageCategoriesContent = () => {
       return;
     }
     
-    addCategory({
+    setIsAdding(true);
+    await addCategory({
       name: newCategoryName.trim(),
       type: activeTab,
     });
     
     setNewCategoryName('');
     setFormError('');
+    setIsAdding(false);
   };
   
   // Handle updating a category
-  const handleUpdateCategory = () => {
+  const handleUpdateCategory = async () => {
     if (!editingCategory || !editingCategory.name.trim()) {
       return;
     }
@@ -84,13 +88,29 @@ const ManageCategoriesContent = () => {
       return;
     }
     
-    updateCategory(editingCategory.id, {
+    setIsUpdating(true);
+    await updateCategory(editingCategory.id, {
       name: editingCategory.name.trim(),
     });
     
     setEditingCategory(null);
     setFormError('');
+    setIsUpdating(false);
   };
+
+  const handleDeleteCategory = async (id: string) => {
+    setIsDeleting(id);
+    await deleteCategory(id);
+    setIsDeleting(null);
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[300px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
   
   return (
     <div className="max-w-2xl mx-auto">
@@ -134,8 +154,12 @@ const ManageCategoriesContent = () => {
                       <p className="text-destructive text-xs mt-1">{formError}</p>
                     )}
                   </div>
-                  <Button onClick={handleAddCategory}>
-                    <PlusIcon className="h-4 w-4 mr-2" />
+                  <Button onClick={handleAddCategory} disabled={isAdding}>
+                    {isAdding ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <PlusIcon className="h-4 w-4 mr-2" />
+                    )}
                     Agregar
                   </Button>
                 </div>
@@ -176,7 +200,11 @@ const ManageCategoriesContent = () => {
                                   <Button 
                                     size="sm" 
                                     onClick={handleUpdateCategory}
+                                    disabled={isUpdating}
                                   >
+                                    {isUpdating ? (
+                                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                                    ) : null}
                                     Guardar
                                   </Button>
                                   <Button 
@@ -186,6 +214,7 @@ const ManageCategoriesContent = () => {
                                       setEditingCategory(null);
                                       setFormError('');
                                     }}
+                                    disabled={isUpdating}
                                   >
                                     Cancelar
                                   </Button>
@@ -233,8 +262,12 @@ const ManageCategoriesContent = () => {
                                         </Button>
                                         <Button 
                                           variant="destructive"
-                                          onClick={() => deleteCategory(category.id)}
+                                          onClick={() => handleDeleteCategory(category.id)}
+                                          disabled={isDeleting === category.id}
                                         >
+                                          {isDeleting === category.id ? (
+                                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                          ) : null}
                                           Eliminar
                                         </Button>
                                       </DialogFooter>
@@ -266,8 +299,12 @@ const ManageCategoriesContent = () => {
                       <p className="text-destructive text-xs mt-1">{formError}</p>
                     )}
                   </div>
-                  <Button onClick={handleAddCategory}>
-                    <PlusIcon className="h-4 w-4 mr-2" />
+                  <Button onClick={handleAddCategory} disabled={isAdding}>
+                    {isAdding ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <PlusIcon className="h-4 w-4 mr-2" />
+                    )}
                     Agregar
                   </Button>
                 </div>
@@ -308,7 +345,11 @@ const ManageCategoriesContent = () => {
                                   <Button 
                                     size="sm" 
                                     onClick={handleUpdateCategory}
+                                    disabled={isUpdating}
                                   >
+                                    {isUpdating ? (
+                                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                                    ) : null}
                                     Guardar
                                   </Button>
                                   <Button 
@@ -318,6 +359,7 @@ const ManageCategoriesContent = () => {
                                       setEditingCategory(null);
                                       setFormError('');
                                     }}
+                                    disabled={isUpdating}
                                   >
                                     Cancelar
                                   </Button>
@@ -365,8 +407,12 @@ const ManageCategoriesContent = () => {
                                         </Button>
                                         <Button 
                                           variant="destructive"
-                                          onClick={() => deleteCategory(category.id)}
+                                          onClick={() => handleDeleteCategory(category.id)}
+                                          disabled={isDeleting === category.id}
                                         >
+                                          {isDeleting === category.id ? (
+                                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                          ) : null}
                                           Eliminar
                                         </Button>
                                       </DialogFooter>

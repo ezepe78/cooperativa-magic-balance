@@ -20,11 +20,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowDownIcon, ArrowUpIcon, FilterIcon, MoreHorizontal, PencilIcon, SearchIcon, Trash2 } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, FilterIcon, MoreHorizontal, PencilIcon, SearchIcon, Trash2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const TransactionsTable = () => {
-  const { transactions, categories, deleteTransaction } = useTransactions();
+  const { transactions, categories, deleteTransaction, isLoading } = useTransactions();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<TransactionType | 'all'>('all');
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ const TransactionsTable = () => {
         const searchTermLower = searchTerm.toLowerCase();
         return (
           transaction.description.toLowerCase().includes(searchTermLower) ||
-          getCategoryName(transaction.category).toLowerCase().includes(searchTermLower) ||
+          getCategoryName(transaction.category_id).toLowerCase().includes(searchTermLower) ||
           (transaction.vendor && transaction.vendor.toLowerCase().includes(searchTermLower))
         );
       }
@@ -64,9 +64,42 @@ const TransactionsTable = () => {
 
   const accountLabels: Record<string, string> = {
     cash: 'Efectivo',
-    banco_provincia: 'Banco Provincia',
-    other: 'Otras Cuentas',
+    banco_provincia: 'Banco Provincia'
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 animate-fade-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="relative flex-1">
+            <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar transacciones..."
+              disabled
+              className="pl-8"
+            />
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Select disabled>
+              <SelectTrigger className="w-[160px]">
+                <div className="flex items-center">
+                  <FilterIcon className="mr-2 h-4 w-4" />
+                  <span>Filtrar por tipo</span>
+                </div>
+              </SelectTrigger>
+            </Select>
+          </div>
+        </div>
+        
+        <div className="rounded-md border bg-white overflow-hidden animate-fade-in">
+          <div className="flex justify-center items-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -129,13 +162,13 @@ const TransactionsTable = () => {
                     {formatDate(transaction.date)}
                   </TableCell>
                   <TableCell>{transaction.description}</TableCell>
-                  <TableCell>{getCategoryName(transaction.category)}</TableCell>
+                  <TableCell>{getCategoryName(transaction.category_id)}</TableCell>
                   <TableCell>{accountLabels[transaction.account]}</TableCell>
                   <TableCell className="hidden md:table-cell">
                     {transaction.vendor || '-'}
                   </TableCell>
                   <TableCell className="hidden md:table-cell font-mono text-xs">
-                    {transaction.checkNumber || '-'}
+                    {transaction.check_number || '-'}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end">
@@ -152,7 +185,7 @@ const TransactionsTable = () => {
                             : "text-destructive"
                         )}
                       >
-                        {formatCurrency(transaction.amount)}
+                        {formatCurrency(Number(transaction.amount))}
                       </span>
                     </div>
                   </TableCell>
