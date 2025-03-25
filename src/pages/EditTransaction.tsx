@@ -23,7 +23,7 @@ const EditTransactionContent = () => {
   const { id } = useParams<{ id: string }>();
   const { transactions, categories, editTransaction } = useTransactions();
   
-  const [transactionType, setTransactionType] = useState<TransactionType>('income');
+  const [type, setType] = useState<TransactionType>('income');
   const [account, setAccount] = useState<TreasuryAccount>('cash');
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
@@ -31,25 +31,30 @@ const EditTransactionContent = () => {
   const [vendor, setVendor] = useState('');
   const [checkNumber, setCheckNumber] = useState('');
   const [date, setDate] = useState<Date>(new Date());
+  const [receipt, setReceipt] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
-    const transaction = transactions.find(t => t.id === id);
-    if (transaction) {
-      setTransactionType(transaction.type);
-      setAccount(transaction.account);
-      setCategory(transaction.category);
-      setAmount(transaction.amount.toString());
-      setDescription(transaction.description);
-      setVendor(transaction.vendor || '');
-      setCheckNumber(transaction.checkNumber || '');
-      setDate(new Date(transaction.date));
-    } else {
-      navigate('/');
+    if (id && transactions.length > 0) {
+      const transaction = transactions.find(t => t.id === id);
+      if (transaction) {
+        setType(transaction.type);
+        setAccount(transaction.account);
+        setCategory(transaction.category_id);
+        setAmount(transaction.amount);
+        setDate(transaction.date);
+        setDescription(transaction.description);
+        setVendor(transaction.vendor || '');
+        setCheckNumber(transaction.check_number || '');
+        setReceipt(transaction.receipt || '');
+        setIsLoading(false);
+      }
     }
-  }, [id, transactions, navigate]);
-  
-  const filteredCategories = categories.filter(c => c.type === transactionType);
+  }, [id, transactions]);
+
+  const filteredCategories = categories.filter(c => c.type === type);
 
   const formatCheckNumber = (value: string) => {
     if (!value) return '';
@@ -75,7 +80,7 @@ const EditTransactionContent = () => {
     
     if (!description.trim()) errors.description = 'Ingrese una descripción';
     
-    if (transactionType === 'expense') {
+    if (type === 'expense') {
       if (!vendor.trim()) {
         errors.vendor = 'Ingrese un proveedor';
       } else if (!isValidVendorName(vendor)) {
@@ -83,7 +88,7 @@ const EditTransactionContent = () => {
       }
     }
     
-    if (transactionType === 'expense' && account === 'banco_provincia') {
+    if (type === 'expense' && account === 'banco_provincia') {
       if (!checkNumber) {
         errors.checkNumber = 'Ingrese un número de cheque';
       } else if (!isValidCheckNumber(checkNumber)) {
@@ -99,22 +104,29 @@ const EditTransactionContent = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    if (validateForm()) {
-      editTransaction(id!, {
-        type: transactionType,
-        account,
-        category,
-        amount: parseFloat(amount),
-        date: date.toISOString().split('T')[0],
-        description,
-        vendor: transactionType === 'expense' ? vendor : undefined,
-        checkNumber: (transactionType === 'expense' && account === 'banco_provincia') ? checkNumber : undefined,
-      });
-      
-      navigate('/');
+    try {
+      if (id) {
+        await editTransaction(id, {
+          type,
+          account,
+          category_id: category,
+          amount,
+          date,
+          description,
+          vendor: vendor || undefined,
+          check_number: checkNumber || undefined,
+          receipt: receipt || undefined,
+        });
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Error updating transaction:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -149,9 +161,9 @@ const EditTransactionContent = () => {
                   <div>
                     <Label>Tipo de transacción</Label>
                     <RadioGroup
-                      value={transactionType}
+                      value={type}
                       onValueChange={(value) => {
-                        setTransactionType(value as TransactionType);
+                        setType(value as TransactionType);
                         setCategory('');
                       }}
                       className="flex space-x-4 pt-2"
@@ -255,7 +267,7 @@ const EditTransactionContent = () => {
                     </div>
                   </div>
                   
-                  {transactionType === 'expense' && (
+                  {type === 'expense' && (
                     <>
                       <div className="space-y-2">
                         <Label htmlFor="vendor">
@@ -278,7 +290,7 @@ const EditTransactionContent = () => {
                     </>
                   )}
                   
-                  {transactionType === 'expense' && account === 'banco_provincia' && (
+                  {type === 'expense' && account === 'banco_provincia' && (
                     <div className="space-y-2">
                       <Label htmlFor="checkNumber">
                         Número de Cheque

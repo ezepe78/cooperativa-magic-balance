@@ -12,6 +12,7 @@ export interface Category {
   id: string;
   name: string;
   type: TransactionType;
+  created_at?: string;
 }
 
 export interface Transaction {
@@ -25,12 +26,14 @@ export interface Transaction {
   vendor?: string;
   check_number?: string;
   receipt?: string;
+  created_at?: string;
 }
 
 interface AccountBalance {
   id: string;
   account: TreasuryAccount;
   initial_balance: number;
+  updated_at?: string;
 }
 
 interface TransactionContextType {
@@ -99,9 +102,31 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
           throw balancesError;
         }
 
+        // Convert the fetched data to the proper types
+        const typedCategories: Category[] = categoriesData.map((cat: any) => ({
+          id: cat.id,
+          name: cat.name,
+          type: cat.type as TransactionType,
+          created_at: cat.created_at
+        }));
+
+        const typedTransactions: Transaction[] = transactionsData.map((trans: any) => ({
+          id: trans.id,
+          type: trans.type as TransactionType,
+          account: trans.account as TreasuryAccount,
+          category_id: trans.category_id,
+          amount: Number(trans.amount),
+          date: trans.date,
+          description: trans.description,
+          vendor: trans.vendor,
+          check_number: trans.check_number,
+          receipt: trans.receipt,
+          created_at: trans.created_at
+        }));
+
         // Set state with the fetched data
-        setCategories(categoriesData);
-        setTransactions(transactionsData);
+        setCategories(typedCategories);
+        setTransactions(typedTransactions);
 
         // Convert balances array to record object
         const balancesRecord: Record<TreasuryAccount, number> = {
@@ -109,9 +134,10 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
           banco_provincia: 0
         };
 
-        balancesData.forEach((balance: AccountBalance) => {
-          if (balance.account in balancesRecord) {
-            balancesRecord[balance.account as TreasuryAccount] = Number(balance.initial_balance);
+        balancesData.forEach((balance: any) => {
+          const accountKey = balance.account as TreasuryAccount;
+          if (accountKey in balancesRecord) {
+            balancesRecord[accountKey] = Number(balance.initial_balance);
           }
         });
 
@@ -137,7 +163,22 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
 
-      setTransactions(prev => [...prev, data]);
+      // Convert the returned data to the proper Transaction type
+      const typedTransaction: Transaction = {
+        id: data.id,
+        type: data.type as TransactionType,
+        account: data.account as TreasuryAccount,
+        category_id: data.category_id,
+        amount: Number(data.amount),
+        date: data.date,
+        description: data.description,
+        vendor: data.vendor,
+        check_number: data.check_number,
+        receipt: data.receipt,
+        created_at: data.created_at
+      };
+
+      setTransactions(prev => [...prev, typedTransaction]);
       toast.success('Transacción agregada correctamente');
     } catch (error) {
       console.error('Error adding transaction:', error);
@@ -193,7 +234,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
 
-      setCategories(prev => [...prev, data]);
+      // Convert the returned data to the proper Category type
+      const typedCategory: Category = {
+        id: data.id,
+        name: data.name,
+        type: data.type as TransactionType,
+        created_at: data.created_at
+      };
+
+      setCategories(prev => [...prev, typedCategory]);
       toast.success('Categoría agregada correctamente');
     } catch (error) {
       console.error('Error adding category:', error);
