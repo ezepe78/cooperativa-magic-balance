@@ -54,7 +54,7 @@ const TransactionsTable = () => {
         return (
           transaction.description.toLowerCase().includes(searchTermLower) ||
           getCategoryName(transaction.category_id).toLowerCase().includes(searchTermLower) ||
-          (transaction.vendor && transaction.vendor.toLowerCase().includes(searchTermLower))
+          (transaction.supplier && transaction.supplier.toLowerCase().includes(searchTermLower))
         );
       }
       
@@ -165,7 +165,7 @@ const TransactionsTable = () => {
                   <TableCell>{getCategoryName(transaction.category_id)}</TableCell>
                   <TableCell>{accountLabels[transaction.account]}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {transaction.vendor || '-'}
+                    {transaction.supplier || '-'}
                   </TableCell>
                   <TableCell className="hidden md:table-cell font-mono text-xs">
                     {transaction.check_number || '-'}
