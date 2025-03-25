@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransactions, TransactionType, TreasuryAccount, Category } from '@/context/TransactionContext';
+import { useTransactions, TransactionType, TreasuryAccount, Category, TransactionProvider } from '@/context/TransactionContext';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 
@@ -16,7 +16,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
-const AddTransaction = () => {
+// Create a content component to use the hooks inside the provider
+const AddTransactionContent = () => {
   const { addTransaction, categories } = useTransactions();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -235,6 +236,15 @@ const AddTransaction = () => {
         </Card>
       </main>
     </div>
+  );
+};
+
+// Wrap the AddTransactionContent with the TransactionProvider
+const AddTransaction = () => {
+  return (
+    <TransactionProvider>
+      <AddTransactionContent />
+    </TransactionProvider>
   );
 };
 
