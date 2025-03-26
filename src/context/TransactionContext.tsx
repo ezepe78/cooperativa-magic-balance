@@ -20,6 +20,8 @@ export interface TransactionContextType {
     totalIncome: number;
     totalExpense: number;
     finalBalance: number;
+    accountInitialBalances: Record<TreasuryAccount, number>;
+    accountFinalBalances: Record<TreasuryAccount, number>;
   };
   isLoading: boolean;
 }

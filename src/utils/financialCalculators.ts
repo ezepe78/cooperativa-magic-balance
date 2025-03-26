@@ -35,6 +35,25 @@ export const calculateTotalBalance = (
   }, 0);
 };
 
+// Calculate account-specific balances
+export const calculateAccountBalances = (
+  transactions: Transaction[],
+  initialBalances: Record<TreasuryAccount, number>
+): Record<TreasuryAccount, number> => {
+  const result: Record<TreasuryAccount, number> = {} as Record<TreasuryAccount, number>;
+  
+  Object.keys(initialBalances).forEach(account => {
+    const accountKey = account as TreasuryAccount;
+    result[accountKey] = calculateBalance(
+      transactions,
+      accountKey,
+      initialBalances[accountKey]
+    );
+  });
+  
+  return result;
+};
+
 // Get summary for a specific month
 export const getMonthlySummary = (
   transactions: Transaction[],
@@ -68,6 +87,17 @@ export const getMonthlySummary = (
   
   const initialBalance = calculateTotalBalance(previousTransactions, initialBalances);
   
+  // Calculate account-specific initial balances
+  const accountInitialBalances = calculateAccountBalances(previousTransactions, initialBalances);
+  
+  // Calculate account-specific final balances (all transactions up to the end of the month)
+  const upToEndOfMonthTransactions = transactions.filter(transaction => {
+    const transactionDate = new Date(transaction.date);
+    return transactionDate <= monthEnd;
+  });
+  
+  const accountFinalBalances = calculateAccountBalances(upToEndOfMonthTransactions, initialBalances);
+  
   // Calculate final balance
   const finalBalance = initialBalance + totalIncome - totalExpense;
   
@@ -75,6 +105,8 @@ export const getMonthlySummary = (
     initialBalance,
     totalIncome,
     totalExpense,
-    finalBalance
+    finalBalance,
+    accountInitialBalances,
+    accountFinalBalances
   };
 };

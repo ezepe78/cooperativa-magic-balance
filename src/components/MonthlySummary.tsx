@@ -3,15 +3,17 @@ import React, { useState } from 'react';
 import { useTransactions } from '@/context/index';
 import { formatCurrency } from '@/utils/formatters';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowDownIcon, ArrowUpIcon, CalendarIcon, Loader2 } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, CalendarIcon, Loader2, Banknote, Building2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { TreasuryAccount } from '@/types/transactions';
+import { cn } from '@/lib/utils';
 
 const MonthlySummary = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   
-  const { getMonthlySummary, isLoading } = useTransactions();
+  const { getMonthlySummary, getBalance, isLoading } = useTransactions();
   
   const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -22,6 +24,21 @@ const MonthlySummary = () => {
   const years = Array.from({ length: 4 }, (_, i) => currentDate.getFullYear() - i);
   
   const summary = getMonthlySummary(selectedMonth, selectedYear);
+
+  const accounts = [
+    { 
+      id: 'cash' as TreasuryAccount, 
+      name: 'Caja chica', 
+      icon: Banknote,
+      iconColor: 'text-green-500' 
+    },
+    { 
+      id: 'banco_provincia' as TreasuryAccount, 
+      name: 'Banco Provincia', 
+      icon: Building2,
+      iconColor: 'text-blue-500'
+    }
+  ];
 
   return (
     <Card className="animate-fade-in">
@@ -69,12 +86,65 @@ const MonthlySummary = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Saldo Inicial</p>
-              <p className="text-xl font-bold">{formatCurrency(summary.initialBalance)}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Initial Balance Section */}
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Saldo Inicial</p>
+                <p className="text-xl font-bold">{formatCurrency(summary.initialBalance)}</p>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-2 pl-1 border-l-2 border-muted">
+                {accounts.map((account) => {
+                  // For initial balance, we need to calculate the balance before the period start
+                  // We can leverage the monthly summary data which already has this calculation
+                  const accountInitialBalance = summary.accountInitialBalances?.[account.id] || 0;
+                  return (
+                    <div key={`initial-${account.id}`} className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <account.icon className={`h-4 w-4 mr-2 ${account.iconColor}`} />
+                        <span className="text-sm">{account.name}</span>
+                      </div>
+                      <div className="font-medium">
+                        {formatCurrency(accountInitialBalance)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             
+            {/* Final Balance Section */}
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">Saldo Final</p>
+                <p className="text-xl font-bold">{formatCurrency(summary.finalBalance)}</p>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-2 pl-1 border-l-2 border-muted">
+                {accounts.map((account) => {
+                  // For final balance, we need to calculate the balance at the end of the period
+                  const accountFinalBalance = summary.accountFinalBalances?.[account.id] || 0;
+                  const isNegative = accountFinalBalance < 0;
+                  return (
+                    <div key={`final-${account.id}`} className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <account.icon className={`h-4 w-4 mr-2 ${account.iconColor}`} />
+                        <span className="text-sm">{account.name}</span>
+                      </div>
+                      <div className={cn(
+                        "font-medium",
+                        isNegative ? "text-destructive" : "text-success"
+                      )}>
+                        {formatCurrency(accountFinalBalance)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            
+            {/* Income Section */}
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground flex items-center">
                 <ArrowUpIcon className="mr-1 h-4 w-4 text-success" /> 
@@ -83,17 +153,13 @@ const MonthlySummary = () => {
               <p className="text-xl font-bold text-success">{formatCurrency(summary.totalIncome)}</p>
             </div>
             
+            {/* Expense Section */}
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground flex items-center">
                 <ArrowDownIcon className="mr-1 h-4 w-4 text-destructive" /> 
                 Egresos
               </p>
               <p className="text-xl font-bold text-destructive">{formatCurrency(summary.totalExpense)}</p>
-            </div>
-            
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">Saldo Final</p>
-              <p className="text-xl font-bold">{formatCurrency(summary.finalBalance)}</p>
             </div>
           </div>
         )}

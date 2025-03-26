@@ -53,36 +53,38 @@ const BalanceSummary = () => {
           <CardTitle className="text-sm font-medium">Saldo Final</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={cn(
-            "text-3xl font-bold",
-            isNegative ? "text-destructive" : "text-success"
-          )}>
-            {formatCurrency(totalBalance)}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1 mb-4">
-            Suma de todas las cuentas
-          </p>
-          
-          {/* Desglose de cuentas dentro de la sección de saldo final */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-muted">
-            {accounts.map((account) => {
-              const balance = getBalance(account.id);
-              const accountIsNegative = balance < 0;
-              return (
-                <div key={account.id} className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <account.icon className={`h-4 w-4 mr-2 ${account.iconColor}`} />
-                    <span className="text-sm">{account.name}</span>
+          <div className="space-y-3">
+            <div className={cn(
+              "text-3xl font-bold",
+              isNegative ? "text-destructive" : "text-success"
+            )}>
+              {formatCurrency(totalBalance)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Suma de todas las cuentas
+            </p>
+            
+            {/* Desglose de cuentas dentro de la sección de saldo final */}
+            <div className="grid grid-cols-1 gap-2 pl-1 border-l-2 border-muted mt-4">
+              {accounts.map((account) => {
+                const balance = getBalance(account.id);
+                const accountIsNegative = balance < 0;
+                return (
+                  <div key={account.id} className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <account.icon className={`h-4 w-4 mr-2 ${account.iconColor}`} />
+                      <span className="text-sm">{account.name}</span>
+                    </div>
+                    <div className={cn(
+                      "font-medium",
+                      accountIsNegative ? "text-destructive" : "text-success"
+                    )}>
+                      {formatCurrency(balance)}
+                    </div>
                   </div>
-                  <div className={cn(
-                    "font-medium",
-                    accountIsNegative ? "text-destructive" : "text-success"
-                  )}>
-                    {formatCurrency(balance)}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </CardContent>
       </Card>
