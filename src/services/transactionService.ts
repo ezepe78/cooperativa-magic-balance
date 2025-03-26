@@ -14,8 +14,8 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
     
     return data.map(transaction => ({
       ...transaction,
-      // Map vendor from supplier if needed (handle database naming differences)
-      vendor: transaction.vendor || transaction.supplier,
+      // Map supplier to vendor for UI consistency
+      vendor: transaction.supplier,
       // Ensure proper typing
       type: transaction.type as TransactionType,
       account: transaction.account as TreasuryAccount
@@ -41,8 +41,8 @@ export const getTransaction = async (id: string): Promise<Transaction | null> =>
     
     return {
       ...data,
-      // Map vendor from supplier if needed
-      vendor: data.vendor || data.supplier,
+      // Map supplier to vendor for UI consistency
+      vendor: data.supplier,
       // Ensure proper typing
       type: data.type as TransactionType,
       account: data.account as TreasuryAccount
@@ -60,7 +60,7 @@ export const addTransaction = async (
   // Format data for insertion
   const dataToInsert = {
     ...transaction,
-    // Map vendor to supplier if needed
+    // Map vendor to supplier for database storage
     supplier: transaction.vendor
   };
   
@@ -75,7 +75,7 @@ export const addTransaction = async (
     
     return {
       ...data,
-      vendor: data.vendor || data.supplier,
+      vendor: data.supplier,
       type: data.type as TransactionType,
       account: data.account as TreasuryAccount
     };

@@ -2,34 +2,30 @@
 import { supabase } from '@/integrations/supabase/client';
 import { TreasuryAccount } from '@/types/transactions';
 
-// Fetch account balances from the database
+// Fetch initial balances for accounts
 export const fetchBalances = async (): Promise<Record<TreasuryAccount, number>> => {
   try {
-    // Fetch all account balances from the database
     const { data, error } = await supabase
       .from('account_balances')
       .select('*');
       
     if (error) throw error;
     
-    // Convert to Record<TreasuryAccount, number>
+    // Convert array to record object with account as key
     const balances: Record<TreasuryAccount, number> = {
       cash: 0,
       banco_provincia: 0
     };
     
-    if (data && data.length > 0) {
-      data.forEach(item => {
-        if (item.account === 'cash' || item.account === 'banco_provincia') {
-          balances[item.account as TreasuryAccount] = Number(item.initial_balance);
-        }
-      });
-    }
+    data.forEach(item => {
+      if (item.account === 'cash' || item.account === 'banco_provincia') {
+        balances[item.account as TreasuryAccount] = Number(item.initial_balance);
+      }
+    });
     
     return balances;
   } catch (error) {
     console.error('Error fetching balances:', error);
-    // Return default balances if there's an error
     return {
       cash: 0,
       banco_provincia: 0
@@ -37,37 +33,20 @@ export const fetchBalances = async (): Promise<Record<TreasuryAccount, number>> 
   }
 };
 
-// Update account balance in the database
+// Update initial balance for an account
 export const updateBalance = async (
   account: TreasuryAccount, 
-  amount: number
+  balance: number
 ): Promise<void> => {
   try {
-    // Check if the balance exists
-    const { data } = await supabase
+    const { error } = await supabase
       .from('account_balances')
-      .select('*')
-      .eq('account', account)
-      .single();
+      .update({ initial_balance: balance, updated_at: new Date().toISOString() })
+      .eq('account', account);
       
-    if (data) {
-      // Update existing balance
-      const { error } = await supabase
-        .from('account_balances')
-        .update({ initial_balance: amount })
-        .eq('account', account);
-        
-      if (error) throw error;
-    } else {
-      // Insert new balance
-      const { error } = await supabase
-        .from('account_balances')
-        .insert({ account, initial_balance: amount });
-        
-      if (error) throw error;
-    }
+    if (error) throw error;
   } catch (error) {
-    console.error(`Error updating balance for ${account}:`, error);
+    console.error('Error updating balance:', error);
     throw error;
   }
 };

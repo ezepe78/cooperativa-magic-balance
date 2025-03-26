@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTransactions, TransactionType, TreasuryAccount } from '@/context/index';
+import { TransactionProvider } from '@/providers/TransactionProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -43,8 +45,8 @@ const EditTransactionContent = () => {
         setType(transaction.type);
         setAccount(transaction.account);
         setCategory(transaction.category_id);
-        setAmount(transaction.amount);
-        setDate(transaction.date);
+        setAmount(transaction.amount.toString());
+        setDate(new Date(transaction.date));
         setDescription(transaction.description);
         setVendor(transaction.vendor || '');
         setCheckNumber(transaction.check_number || '');
@@ -114,8 +116,8 @@ const EditTransactionContent = () => {
           type,
           account,
           category_id: category,
-          amount,
-          date,
+          amount: parseFloat(amount),
+          date: date.toISOString(),
           description,
           vendor: vendor || undefined,
           check_number: checkNumber || undefined,

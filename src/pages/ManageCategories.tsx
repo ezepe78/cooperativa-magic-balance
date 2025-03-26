@@ -27,6 +27,8 @@ import {
 } from '@/components/ui/dialog';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, Trash2, Loader2 } from 'lucide-react';
 
+import { TransactionProvider } from '@/providers/TransactionProvider';
+
 const ManageCategoriesContent = () => {
   const { categories, addCategory, updateCategory, deleteCategory, isLoading } = useTransactions();
   

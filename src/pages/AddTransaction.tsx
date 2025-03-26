@@ -1,6 +1,7 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransactions, TransactionType, TreasuryAccount, Category } from '@/context/index';
+import { useTransactions, TransactionType, TreasuryAccount } from '@/context/index';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 

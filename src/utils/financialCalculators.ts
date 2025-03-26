@@ -1,83 +1,78 @@
 
 import { Transaction, TreasuryAccount } from '@/types/transactions';
 
-// Calculate balance for a specific account
+// Calculate current balance for an account
 export const calculateBalance = (
   transactions: Transaction[],
   account: TreasuryAccount,
   initialBalance: number
 ): number => {
-  const balance = transactions.reduce((acc, transaction) => {
-    if (transaction.account !== account) {
-      return acc;
-    }
-    
-    return transaction.type === 'income' 
-      ? acc + Number(transaction.amount) 
-      : acc - Number(transaction.amount);
-  }, 0);
+  const accountTransactions = transactions.filter(t => t.account === account);
   
-  return initialBalance + balance;
+  const balance = accountTransactions.reduce((acc, transaction) => {
+    if (transaction.type === 'income') {
+      return acc + Number(transaction.amount);
+    } else {
+      return acc - Number(transaction.amount);
+    }
+  }, initialBalance);
+  
+  return balance;
 };
 
-// Calculate total balance for all accounts
+// Calculate total balance across all accounts
 export const calculateTotalBalance = (
   transactions: Transaction[],
   initialBalances: Record<TreasuryAccount, number>
 ): number => {
-  // Get all unique accounts from initial balances
-  const accounts = Object.keys(initialBalances) as TreasuryAccount[];
-  
-  return accounts.reduce((total, account) => {
+  return Object.keys(initialBalances).reduce((total, account) => {
     const accountBalance = calculateBalance(
-      transactions,
-      account,
-      initialBalances[account]
+      transactions, 
+      account as TreasuryAccount,
+      initialBalances[account as TreasuryAccount]
     );
     return total + accountBalance;
   }, 0);
 };
 
-// Calculate monthly summary (incomes, expenses, balance)
+// Get summary for a specific month
 export const getMonthlySummary = (
   transactions: Transaction[],
   initialBalances: Record<TreasuryAccount, number>,
-  month: number,
+  month: number, // 0-indexed (0 = January)
   year: number
 ) => {
-  // Filter transactions by month and year
-  const startDate = new Date(year, month, 1);
-  const endDate = new Date(year, month + 1, 0);
+  // Filter transactions for the given month
+  const monthStart = new Date(year, month, 1);
+  const monthEnd = new Date(year, month + 1, 0);
   
-  // Calculate initial balance (sum of all account balances at the beginning of the month)
-  const totalInitialBalance = calculateTotalBalance(
-    transactions.filter(t => new Date(t.date) < startDate),
-    initialBalances
-  );
-  
-  // Filter transactions for the current month
-  const monthlyTransactions = transactions.filter(transaction => {
+  const monthTransactions = transactions.filter(transaction => {
     const transactionDate = new Date(transaction.date);
-    return (
-      transactionDate >= startDate &&
-      transactionDate <= endDate
-    );
+    return transactionDate >= monthStart && transactionDate <= monthEnd;
   });
   
   // Calculate income and expense totals
-  const totalIncome = monthlyTransactions
+  const totalIncome = monthTransactions
     .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + Number(t.amount), 0);
     
-  const totalExpense = monthlyTransactions
+  const totalExpense = monthTransactions
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + Number(t.amount), 0);
-    
+  
+  // Calculate initial balance at the start of the month
+  const previousTransactions = transactions.filter(transaction => {
+    const transactionDate = new Date(transaction.date);
+    return transactionDate < monthStart;
+  });
+  
+  const initialBalance = calculateTotalBalance(previousTransactions, initialBalances);
+  
   // Calculate final balance
-  const finalBalance = totalInitialBalance + totalIncome - totalExpense;
+  const finalBalance = initialBalance + totalIncome - totalExpense;
   
   return {
-    initialBalance: totalInitialBalance,
+    initialBalance,
     totalIncome,
     totalExpense,
     finalBalance
