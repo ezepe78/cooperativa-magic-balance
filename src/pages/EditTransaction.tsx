@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useTransactions, TransactionType, TreasuryAccount, TransactionProvider } from '@/context/TransactionContext';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTransactions, TransactionType, TreasuryAccount } from '@/context/index';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

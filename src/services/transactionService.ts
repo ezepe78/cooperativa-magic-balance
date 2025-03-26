@@ -1,7 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction, TransactionType, TreasuryAccount } from '@/types/transactions';
-import { v4 as uuidv4 } from 'uuid';
 
 // Fetch all transactions
 export const fetchTransactions = async (): Promise<Transaction[]> => {
@@ -13,55 +12,72 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
       
     if (error) throw error;
     
-    // Map DB fields to our Transaction type
-    return (data || []).map(item => ({
-      id: item.id,
-      type: item.type as TransactionType,
-      account: item.account as TreasuryAccount,
-      category_id: item.category_id,
-      amount: Number(item.amount),
-      date: item.date,
-      description: item.description,
-      vendor: item.supplier, // Map supplier to vendor
-      check_number: item.check_number || '',
-      receipt: item.receipt || '',
-      created_at: item.created_at
+    return data.map(transaction => ({
+      ...transaction,
+      // Map vendor from supplier if needed (handle database naming differences)
+      vendor: transaction.vendor || transaction.supplier,
+      // Ensure proper typing
+      type: transaction.type as TransactionType,
+      account: transaction.account as TreasuryAccount
     }));
   } catch (error) {
     console.error('Error fetching transactions:', error);
-    throw error;
+    return [];
+  }
+};
+
+// Get a single transaction by ID
+export const getTransaction = async (id: string): Promise<Transaction | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('id', id)
+      .single();
+      
+    if (error) throw error;
+    
+    if (!data) return null;
+    
+    return {
+      ...data,
+      // Map vendor from supplier if needed
+      vendor: data.vendor || data.supplier,
+      // Ensure proper typing
+      type: data.type as TransactionType,
+      account: data.account as TreasuryAccount
+    };
+  } catch (error) {
+    console.error('Error fetching transaction:', error);
+    return null;
   }
 };
 
 // Add a new transaction
-export const addTransaction = async (transaction: Omit<Transaction, 'id'>): Promise<Transaction> => {
+export const addTransaction = async (
+  transaction: Omit<Transaction, 'id'>
+): Promise<Transaction> => {
+  // Format data for insertion
+  const dataToInsert = {
+    ...transaction,
+    // Map vendor to supplier if needed
+    supplier: transaction.vendor
+  };
+  
   try {
-    const id = uuidv4();
-    const newTransaction = {
-      id,
-      type: transaction.type as string,
-      account: transaction.account as string,
-      category_id: transaction.category_id,
-      amount: transaction.amount,
-      date: transaction.date,
-      description: transaction.description,
-      supplier: transaction.vendor, // Map vendor to supplier for DB
-      check_number: transaction.check_number || null,
-      receipt: transaction.receipt || null,
-      created_at: new Date().toISOString()
-    };
-    
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('transactions')
-      .insert(newTransaction);
+      .insert(dataToInsert)
+      .select()
+      .single();
       
     if (error) throw error;
     
-    // Return the newly created transaction with proper type mapping
     return {
-      ...transaction,
-      id,
-      created_at: newTransaction.created_at
+      ...data,
+      vendor: data.vendor || data.supplier,
+      type: data.type as TransactionType,
+      account: data.account as TreasuryAccount
     };
   } catch (error) {
     console.error('Error adding transaction:', error);
@@ -69,22 +85,22 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id'>): Prom
   }
 };
 
-// Update existing transaction
+// Update an existing transaction
 export const updateTransaction = async (
-  id: string, 
-  data: Partial<Omit<Transaction, 'id'>>
+  id: string,
+  updates: Partial<Omit<Transaction, 'id'>>
 ): Promise<void> => {
+  // Format data for update
+  const dataToUpdate = {
+    ...updates,
+    // Map vendor to supplier if needed
+    ...(updates.vendor && { supplier: updates.vendor })
+  };
+  
   try {
-    // Map vendor to supplier for the database
-    const dbData: any = { ...data };
-    if (data.vendor !== undefined) {
-      dbData.supplier = data.vendor;
-      delete dbData.vendor;
-    }
-    
     const { error } = await supabase
       .from('transactions')
-      .update(dbData)
+      .update(dataToUpdate)
       .eq('id', id);
       
     if (error) throw error;

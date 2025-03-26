@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransactions, TransactionType, TreasuryAccount, Category } from '@/context/TransactionContext';
+import { useTransactions, TransactionType, TreasuryAccount, Category } from '@/context/index';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 
@@ -32,7 +32,6 @@ const AddTransaction = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
   
-  // Filter categories based on the transaction type
   const filteredCategories = categories.filter(cat => cat.type === type);
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,7 +42,7 @@ const AddTransaction = () => {
       await addTransaction({
         type: type,
         account: account,
-        category_id: category, // Use category as category_id
+        category_id: category,
         amount: amount,
         date: date,
         description: description,
@@ -52,7 +51,6 @@ const AddTransaction = () => {
         receipt: receipt
       });
       
-      // Reset form
       setType('expense');
       setAccount('cash');
       setCategory('');

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TransactionProvider, useTransactions, TransactionType } from '@/context/TransactionContext';
+import { useTransactions, TransactionType } from '@/context/index';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 
@@ -38,17 +38,14 @@ const ManageCategoriesContent = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   
-  // Filter categories based on the active tab
   const filteredCategories = categories.filter(category => category.type === activeTab);
   
-  // Handle adding a new category
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) {
       setFormError('Ingrese un nombre de categoría válido');
       return;
     }
     
-    // Check if category already exists
     const exists = categories.some(
       category => category.name.toLowerCase() === newCategoryName.trim().toLowerCase() && category.type === activeTab
     );
@@ -69,13 +66,11 @@ const ManageCategoriesContent = () => {
     setIsAdding(false);
   };
   
-  // Handle updating a category
   const handleUpdateCategory = async () => {
     if (!editingCategory || !editingCategory.name.trim()) {
       return;
     }
     
-    // Check if category already exists (excluding the current category)
     const exists = categories.some(
       category => 
         category.id !== editingCategory.id && 
