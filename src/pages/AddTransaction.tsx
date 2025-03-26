@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransactions, TransactionType, TreasuryAccount } from '@/context/index';
+import { useTransactions } from '@/context/useTransactions';
+import { TransactionType, TreasuryAccount } from '@/types/transactions';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useTransactions, TransactionType } from '@/context/index';
+import { useTransactions } from '@/context/useTransactions';
+import { TransactionType } from '@/types/transactions';
 import Navbar from '@/components/Navbar';
-import { cn } from '@/lib/utils';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
