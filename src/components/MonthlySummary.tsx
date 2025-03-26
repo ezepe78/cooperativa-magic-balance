@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useTransactions } from '@/context/TransactionContext';
+import { useTransactions } from '@/context/index';
 import { formatCurrency } from '@/utils/formatters';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowDownIcon, ArrowUpIcon, CalendarIcon, Loader2 } from 'lucide-react';

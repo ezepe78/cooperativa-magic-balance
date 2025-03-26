@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { Transaction, useTransactions, Category, TransactionType } from '@/context/TransactionContext';
+import { useTransactions } from '@/context/index';
+import { Transaction, Category, TransactionType } from '@/types/transactions';
 import { formatCurrency, formatDate } from '@/utils/formatters';
 import { useNavigate } from 'react-router-dom';
 import {

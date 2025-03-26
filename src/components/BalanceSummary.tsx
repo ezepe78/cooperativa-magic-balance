@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { useTransactions, TreasuryAccount } from '@/context/TransactionContext';
+import { useTransactions } from '@/context/index';
+import { TreasuryAccount } from '@/types/transactions';
 import { formatCurrency } from '@/utils/formatters';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Banknote, Building2, Loader2 } from 'lucide-react';
