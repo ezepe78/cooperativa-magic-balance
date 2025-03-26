@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TransactionProvider } from '@/providers/TransactionProvider';
+import { TransactionProvider } from '@/context/TransactionContext';
 import PageLayout from '@/components/layouts/PageLayout';
 import TransactionForm from '@/components/transactions/TransactionForm';
 

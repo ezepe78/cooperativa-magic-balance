@@ -1,8 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTransactions } from '@/context/TransactionContext';
-import { TransactionType, TreasuryAccount } from '@/types/transactions';
+import { TransactionType, TreasuryAccount, useTransactions } from '@/context/TransactionContext';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';

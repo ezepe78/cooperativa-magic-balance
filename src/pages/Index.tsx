@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TransactionProvider } from '@/providers/TransactionProvider';
+import { TransactionProvider } from '@/context/TransactionContext';
 import Navbar from '@/components/Navbar';
 import BalanceSummary from '@/components/BalanceSummary';
 import MonthlySummary from '@/components/MonthlySummary';
