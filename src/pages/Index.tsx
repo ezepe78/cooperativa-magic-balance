@@ -12,9 +12,9 @@ const Index = () => {
       
       <main className="flex-1 container mx-auto p-4 md:p-6 pb-20">
         <div className="space-y-6">
-          <BalanceSummary />
-          
           <MonthlySummary />
+          
+          <BalanceSummary />
           
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4 animate-fade-in">

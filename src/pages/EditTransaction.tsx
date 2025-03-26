@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTransactions } from '@/context/useTransactions';
@@ -13,8 +14,8 @@ import { Button } from '@/components/ui/button';
 import { CalendarIcon, CheckCheck, Loader2 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { formatDate } from '@/utils/formatters';
 
 const EditTransaction = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,7 +31,6 @@ const EditTransaction = () => {
   const [description, setDescription] = useState<string>('');
   const [vendor, setVendor] = useState<string>('');
   const [checkNumber, setCheckNumber] = useState<string>('');
-  const [receipt, setReceipt] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -46,7 +46,6 @@ const EditTransaction = () => {
         setDescription(transaction.description);
         setVendor(transaction.vendor || '');
         setCheckNumber(transaction.check_number || '');
-        setReceipt(transaction.receipt || '');
       }
     }
   }, [id, transactions]);
@@ -67,8 +66,7 @@ const EditTransaction = () => {
           date: date,
           description: description,
           vendor: vendor,
-          check_number: checkNumber,
-          receipt: receipt
+          check_number: checkNumber
         });
 
         navigate('/');
@@ -110,7 +108,7 @@ const EditTransaction = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="income">Ingreso</SelectItem>
-                    <SelectItem value="expense">Gasto</SelectItem>
+                    <SelectItem value="expense">Egreso</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -122,7 +120,7 @@ const EditTransaction = () => {
                     <SelectValue placeholder="Selecciona una cuenta" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="cash">Efectivo</SelectItem>
+                    <SelectItem value="cash">Caja chica</SelectItem>
                     <SelectItem value="banco_provincia">Banco Provincia</SelectItem>
                   </SelectContent>
                 </Select>
@@ -167,7 +165,7 @@ const EditTransaction = () => {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(new Date(date), "PPP") : <span>Seleccionar fecha</span>}
+                      {date ? formatDate(new Date(date)) : <span>Seleccionar fecha</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -197,38 +195,31 @@ const EditTransaction = () => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="vendor">Proveedor (Opcional)</Label>
-                <Input
-                  type="text"
-                  id="vendor"
-                  placeholder="Nombre del proveedor"
-                  value={vendor}
-                  onChange={(e) => setVendor(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="checkNumber">Número de Cheque (Opcional)</Label>
-                <Input
-                  type="text"
-                  id="checkNumber"
-                  placeholder="Número de cheque"
-                  value={checkNumber}
-                  onChange={(e) => setCheckNumber(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="receipt">Recibo (Opcional)</Label>
-                <Input
-                  type="text"
-                  id="receipt"
-                  placeholder="URL del recibo"
-                  value={receipt}
-                  onChange={(e) => setReceipt(e.target.value)}
-                />
-              </div>
+              {type === 'expense' && (
+                <>
+                  <div>
+                    <Label htmlFor="vendor">Proveedor (Opcional)</Label>
+                    <Input
+                      type="text"
+                      id="vendor"
+                      placeholder="Nombre del proveedor"
+                      value={vendor}
+                      onChange={(e) => setVendor(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="checkNumber">Número de Cheque (Opcional)</Label>
+                    <Input
+                      type="text"
+                      id="checkNumber"
+                      placeholder="Número de cheque"
+                      value={checkNumber}
+                      onChange={(e) => setCheckNumber(e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
 
               <Button disabled={isSubmitting} className="w-full">
                 {isSubmitting ? (

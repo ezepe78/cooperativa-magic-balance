@@ -86,7 +86,7 @@ const MonthlySummary = () => {
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground flex items-center">
                 <ArrowDownIcon className="mr-1 h-4 w-4 text-destructive" /> 
-                Gastos
+                Egresos
               </p>
               <p className="text-xl font-bold text-destructive">{formatCurrency(summary.totalExpense)}</p>
             </div>

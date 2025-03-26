@@ -19,11 +19,13 @@ export const formatCurrency = (amount: number): string => {
  */
 export const formatDate = (dateString: string | Date): string => {
   const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-  return new Intl.DateTimeFormat('es-AR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date);
+  
+  // Format as DD/MM/YYYY
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  
+  return `${day}/${month}/${year}`;
 };
 
 /**

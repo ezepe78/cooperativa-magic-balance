@@ -19,5 +19,4 @@ export interface Transaction {
   type: TransactionType;
   vendor?: string;
   check_number?: string;
-  receipt?: string;
 }
