@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Category } from '@/types/transactions';
+import { Category, TransactionType } from '@/types/transactions';
 
 export const fetchCategories = async (): Promise<Category[]> => {
   const { data, error } = await supabase
@@ -13,7 +13,7 @@ export const fetchCategories = async (): Promise<Category[]> => {
   return data.map((cat: any) => ({
     id: cat.id,
     name: cat.name,
-    type: cat.type,
+    type: cat.type as TransactionType,
     created_at: cat.created_at
   }));
 };
@@ -31,7 +31,7 @@ export const addCategory = async (category: Omit<Category, 'id'>): Promise<Categ
   return {
     id: data.id,
     name: data.name,
-    type: data.type,
+    type: data.type as TransactionType,
     created_at: data.created_at
   };
 };

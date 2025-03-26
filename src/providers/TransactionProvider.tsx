@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
-import { TransactionContext } from '@/context/TransactionContext';
+import { TransactionContext } from '@/context/transaction/TransactionContext';
 import { 
   Transaction, 
   Category, 
