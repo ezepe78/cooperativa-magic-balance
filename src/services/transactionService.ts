@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Transaction, TransactionType, TreasuryAccount } from '@/types/transactions';
+import { Transaction } from '@/types/transactions';
 
 export const fetchTransactions = async (): Promise<Transaction[]> => {
   const { data, error } = await supabase
@@ -12,8 +12,8 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
   // Convert the fetched data to the proper types
   return data.map((trans: any) => ({
     id: trans.id,
-    type: trans.type as TransactionType,
-    account: trans.account as TreasuryAccount,
+    type: trans.type,
+    account: trans.account,
     category_id: trans.category_id,
     amount: Number(trans.amount),
     date: trans.date,
@@ -45,8 +45,8 @@ export const addTransaction = async (transaction: Omit<Transaction, 'id'>): Prom
   // Convert the returned data to the proper Transaction type
   return {
     id: data.id,
-    type: data.type as TransactionType,
-    account: data.account as TreasuryAccount,
+    type: data.type,
+    account: data.account,
     category_id: data.category_id,
     amount: Number(data.amount),
     date: data.date,
