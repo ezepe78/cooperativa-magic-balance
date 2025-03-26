@@ -36,20 +36,6 @@ const BalanceSummary = () => {
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </CardContent>
         </Card>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {accounts.map((account) => (
-            <Card key={account.id} className="overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
-                <account.icon className={`h-5 w-5 ${account.iconColor}`} />
-              </CardHeader>
-              <CardContent className="flex items-center justify-center py-6">
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
       </div>
     );
   }
@@ -73,34 +59,33 @@ const BalanceSummary = () => {
           )}>
             {formatCurrency(totalBalance)}
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1 mb-4">
             Suma de todas las cuentas
           </p>
+          
+          {/* Desglose de cuentas dentro de la sección de saldo final */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-muted">
+            {accounts.map((account) => {
+              const balance = getBalance(account.id);
+              const accountIsNegative = balance < 0;
+              return (
+                <div key={account.id} className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <account.icon className={`h-4 w-4 mr-2 ${account.iconColor}`} />
+                    <span className="text-sm">{account.name}</span>
+                  </div>
+                  <div className={cn(
+                    "font-medium",
+                    accountIsNegative ? "text-destructive" : "text-success"
+                  )}>
+                    {formatCurrency(balance)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {accounts.map((account) => {
-          const balance = getBalance(account.id);
-          const Icon = account.icon;
-          return (
-            <Card key={account.id} className="overflow-hidden card-hover">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
-                <Icon className={`h-5 w-5 ${account.iconColor}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(balance)}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Saldo actual
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
     </div>
   );
 };

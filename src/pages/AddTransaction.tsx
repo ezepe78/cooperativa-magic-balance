@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTransactions } from '@/context/useTransactions';
 import { TransactionType, TreasuryAccount } from '@/types/transactions';
@@ -85,59 +85,7 @@ const AddTransaction = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="type">Tipo de Transacción</Label>
-                <Select value={type} onValueChange={(value) => setType(value as TransactionType)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona un tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="income">Ingreso</SelectItem>
-                    <SelectItem value="expense">Egreso</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="account">Cuenta</Label>
-                <Select value={account} onValueChange={(value) => setAccount(value as TreasuryAccount)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona una cuenta" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash">Caja chica</SelectItem>
-                    <SelectItem value="banco_provincia">Banco Provincia</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="category">Categoría</Label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona una categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredCategories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="amount">Monto</Label>
-                <Input
-                  type="number"
-                  id="amount"
-                  placeholder="0.00"
-                  value={amount === 0 ? '' : amount.toString()}
-                  onChange={(e) => setAmount(Number(e.target.value))}
-                />
-              </div>
-              
+              {/* Fecha - Primer campo */}
               <div>
                 <Label htmlFor="date">Fecha</Label>
                 <Popover open={open} onOpenChange={setOpen}>
@@ -169,19 +117,55 @@ const AddTransaction = () => {
                 </Popover>
               </div>
               
+              {/* Tipo - Segundo campo */}
               <div>
-                <Label htmlFor="description">Descripción</Label>
-                <Input
-                  type="text"
-                  id="description"
-                  placeholder="Descripción de la transacción"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
+                <Label htmlFor="type">Tipo de Transacción</Label>
+                <Select value={type} onValueChange={(value) => setType(value as TransactionType)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona un tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="income">Ingreso</SelectItem>
+                    <SelectItem value="expense">Egreso</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
+              {/* Cuenta - Tercer campo */}
+              <div>
+                <Label htmlFor="account">Cuenta</Label>
+                <Select value={account} onValueChange={(value) => setAccount(value as TreasuryAccount)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona una cuenta" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Caja chica</SelectItem>
+                    <SelectItem value="banco_provincia">Banco Provincia</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Categoría - Cuarto campo */}
+              <div>
+                <Label htmlFor="category">Categoría</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona una categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Campos específicos para Egreso */}
               {type === 'expense' && (
                 <>
+                  {/* Proveedor - Quinto campo (condicional) */}
                   <div>
                     <Label htmlFor="vendor">Proveedor (Opcional)</Label>
                     <Input
@@ -193,6 +177,7 @@ const AddTransaction = () => {
                     />
                   </div>
                   
+                  {/* Número de Cheque - Sexto campo (condicional) */}
                   <div>
                     <Label htmlFor="checkNumber">Número de Cheque (Opcional)</Label>
                     <Input
@@ -205,6 +190,30 @@ const AddTransaction = () => {
                   </div>
                 </>
               )}
+              
+              {/* Monto - Séptimo campo */}
+              <div>
+                <Label htmlFor="amount">Monto</Label>
+                <Input
+                  type="number"
+                  id="amount"
+                  placeholder="0.00"
+                  value={amount === 0 ? '' : amount.toString()}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                />
+              </div>
+              
+              {/* Descripción - Octavo campo */}
+              <div>
+                <Label htmlFor="description">Descripción</Label>
+                <Input
+                  type="text"
+                  id="description"
+                  placeholder="Descripción de la transacción"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
               
               <Button disabled={isSubmitting} className="w-full">
                 {isSubmitting ? (
