@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TransactionProvider, useTransactions, TransactionType } from '@/context/index';
+import { TransactionProvider, useTransactions, TransactionType } from '@/context/TransactionContext';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
 

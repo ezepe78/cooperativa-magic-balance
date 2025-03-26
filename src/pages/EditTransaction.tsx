@@ -1,9 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTransactions } from '@/context/TransactionContext';
-import { TransactionProvider } from '@/providers/TransactionProvider';
-import { TransactionType, TreasuryAccount } from '@/types/transactions';
+import { useTransactions, TransactionType, TreasuryAccount, TransactionProvider } from '@/context/TransactionContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -29,7 +26,7 @@ const EditTransactionContent = () => {
   const [type, setType] = useState<TransactionType>('income');
   const [account, setAccount] = useState<TreasuryAccount>('cash');
   const [category, setCategory] = useState('');
-  const [amount, setAmount] = useState<string>('');
+  const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [vendor, setVendor] = useState('');
   const [checkNumber, setCheckNumber] = useState('');
@@ -46,10 +43,10 @@ const EditTransactionContent = () => {
         setType(transaction.type);
         setAccount(transaction.account);
         setCategory(transaction.category_id);
-        setAmount(String(transaction.amount));
-        setDate(new Date(transaction.date));
+        setAmount(transaction.amount);
+        setDate(transaction.date);
         setDescription(transaction.description);
-        setVendor(transaction.supplier || '');
+        setVendor(transaction.vendor || '');
         setCheckNumber(transaction.check_number || '');
         setReceipt(transaction.receipt || '');
         setIsLoading(false);
@@ -113,16 +110,14 @@ const EditTransactionContent = () => {
     
     try {
       if (id) {
-        const formattedDate = date.toISOString().split('T')[0];
-        
         await editTransaction(id, {
           type,
           account,
           category_id: category,
-          amount: parseFloat(amount),
-          date: formattedDate,
+          amount,
+          date,
           description,
-          supplier: vendor || undefined,
+          vendor: vendor || undefined,
           check_number: checkNumber || undefined,
           receipt: receipt || undefined,
         });

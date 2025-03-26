@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
-import { useTransactions } from '@/context/TransactionContext';
-import { Transaction, TransactionType } from '@/types/transactions';
+import { Transaction, useTransactions, Category, TransactionType } from '@/context/TransactionContext';
 import { formatCurrency, formatDate } from '@/utils/formatters';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -55,7 +54,7 @@ const TransactionsTable = () => {
         return (
           transaction.description.toLowerCase().includes(searchTermLower) ||
           getCategoryName(transaction.category_id).toLowerCase().includes(searchTermLower) ||
-          (transaction.supplier && transaction.supplier.toLowerCase().includes(searchTermLower))
+          (transaction.vendor && transaction.vendor.toLowerCase().includes(searchTermLower))
         );
       }
       
@@ -166,7 +165,7 @@ const TransactionsTable = () => {
                   <TableCell>{getCategoryName(transaction.category_id)}</TableCell>
                   <TableCell>{accountLabels[transaction.account]}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {transaction.supplier || '-'}
+                    {transaction.vendor || '-'}
                   </TableCell>
                   <TableCell className="hidden md:table-cell font-mono text-xs">
                     {transaction.check_number || '-'}
