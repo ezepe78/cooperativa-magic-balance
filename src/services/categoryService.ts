@@ -1,0 +1,75 @@
+
+import { supabase } from '@/integrations/supabase/client';
+import { Category, TransactionType } from '@/types/transactions';
+
+export const fetchCategories = async (): Promise<Category[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*');
+
+    if (error) throw error;
+
+    // Convert the fetched data to the proper Category type
+    return data.map((cat: any) => ({
+      id: cat.id,
+      name: cat.name,
+      type: cat.type as TransactionType,
+      created_at: cat.created_at
+    }));
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
+};
+
+export const addCategory = async (category: Omit<Category, 'id'>): Promise<Category> => {
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .insert([category])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Convert the returned data to the proper Category type
+    return {
+      id: data.id,
+      name: data.name,
+      type: data.type as TransactionType,
+      created_at: data.created_at
+    };
+  } catch (error) {
+    console.error('Error adding category:', error);
+    throw error;
+  }
+};
+
+export const updateCategory = async (id: string, data: Partial<Omit<Category, 'id'>>): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('categories')
+      .update(data)
+      .eq('id', id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error updating category:', error);
+    throw error;
+  }
+};
+
+export const deleteCategory = async (id: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    throw error;
+  }
+};
