@@ -36,6 +36,9 @@
     --ring: 240 5% 64.9%;
 
     --radius: 0.75rem;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
   }
 
   .dark {
@@ -66,6 +69,9 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
   }
 }
 
@@ -159,5 +165,17 @@
   
   .card-hover {
     @apply transition-all duration-300 hover:shadow-md hover:translate-y-[-2px];
+  }
+  
+  .text-success {
+    @apply text-green-600;
+  }
+  
+  .bg-success {
+    @apply bg-green-600;
+  }
+  
+  .border-success {
+    @apply border-green-600;
   }
 }

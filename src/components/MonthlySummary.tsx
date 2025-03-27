@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import { useTransactions } from '@/context/index';
 import { formatCurrency } from '@/utils/formatters';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ArrowDownIcon, 
   ArrowUpIcon, 
-  CalendarIcon, 
   Loader2, 
   Banknote, 
   Building2,
@@ -25,7 +24,7 @@ const MonthlySummary = () => {
   const [initialBalanceOpen, setInitialBalanceOpen] = useState(false);
   const [finalBalanceOpen, setFinalBalanceOpen] = useState(false);
   
-  const { getMonthlySummary, getBalance, isLoading } = useTransactions();
+  const { getMonthlySummary, isLoading } = useTransactions();
   
   const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -98,7 +97,7 @@ const MonthlySummary = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Initial Balance Section - Now Collapsible */}
             <div className="space-y-3">
               <Collapsible
@@ -140,6 +139,24 @@ const MonthlySummary = () => {
                   </div>
                 </CollapsibleContent>
               </Collapsible>
+            </div>
+            
+            {/* Income Section */}
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground flex items-center">
+                <ArrowUpIcon className="mr-1 h-4 w-4 text-success" /> 
+                Total Ingresos
+              </p>
+              <p className="text-xl font-bold text-success">{formatCurrency(summary.totalIncome)}</p>
+            </div>
+            
+            {/* Expense Section */}
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground flex items-center">
+                <ArrowDownIcon className="mr-1 h-4 w-4 text-destructive" /> 
+                Total Egresos
+              </p>
+              <p className="text-xl font-bold text-destructive">{formatCurrency(summary.totalExpense)}</p>
             </div>
             
             {/* Final Balance Section - Now Collapsible */}
@@ -193,33 +210,9 @@ const MonthlySummary = () => {
                 </CollapsibleContent>
               </Collapsible>
             </div>
-            
-            {/* Income Section */}
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground flex items-center">
-                <ArrowUpIcon className="mr-1 h-4 w-4 text-success" /> 
-                Ingresos
-              </p>
-              <p className="text-xl font-bold text-success">{formatCurrency(summary.totalIncome)}</p>
-            </div>
-            
-            {/* Expense Section */}
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground flex items-center">
-                <ArrowDownIcon className="mr-1 h-4 w-4 text-destructive" /> 
-                Egresos
-              </p>
-              <p className="text-xl font-bold text-destructive">{formatCurrency(summary.totalExpense)}</p>
-            </div>
           </div>
         )}
       </CardContent>
-      <CardFooter className="bg-muted/50 py-2">
-        <div className="flex items-center text-xs text-muted-foreground">
-          <CalendarIcon className="mr-1 h-3 w-3" />
-          <span>Período: {months[selectedMonth]} {selectedYear}</span>
-        </div>
-      </CardFooter>
     </Card>
   );
 };

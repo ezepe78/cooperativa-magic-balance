@@ -1,9 +1,8 @@
 
 import React from 'react';
 import Navbar from '@/components/Navbar';
-import BalanceSummary from '@/components/BalanceSummary';
 import MonthlySummary from '@/components/MonthlySummary';
-import TransactionsTable from '@/components/TransactionsTable';
+import TransactionsPeriodTable from '@/components/TransactionsPeriodTable';
 
 const Index = () => {
   return (
@@ -14,14 +13,12 @@ const Index = () => {
         <div className="space-y-6">
           <MonthlySummary />
           
-          <BalanceSummary />
-          
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4 animate-fade-in">
-              Transacciones Recientes
+              Transacciones del Período
             </h2>
             
-            <TransactionsTable />
+            <TransactionsPeriodTable />
           </div>
         </div>
       </main>
