@@ -63,8 +63,8 @@ export type Database = {
           id: string
           person_name: string | null
           receipt: string | null
-          supplier: string | null
           type: string
+          vendor: string | null
         }
         Insert: {
           account: string
@@ -77,8 +77,8 @@ export type Database = {
           id?: string
           person_name?: string | null
           receipt?: string | null
-          supplier?: string | null
           type: string
+          vendor?: string | null
         }
         Update: {
           account?: string
@@ -91,8 +91,8 @@ export type Database = {
           id?: string
           person_name?: string | null
           receipt?: string | null
-          supplier?: string | null
           type?: string
+          vendor?: string | null
         }
         Relationships: []
       }

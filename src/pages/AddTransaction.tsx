@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { CalendarIcon, CheckCheck, Loader2 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { formatDate } from '@/utils/formatters';
 

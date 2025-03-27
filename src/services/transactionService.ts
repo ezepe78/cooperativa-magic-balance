@@ -14,8 +14,6 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
     
     return data.map(transaction => ({
       ...transaction,
-      // Map supplier to vendor for UI consistency
-      vendor: transaction.supplier,
       // Ensure proper typing
       type: transaction.type as TransactionType,
       account: transaction.account as TreasuryAccount
@@ -41,8 +39,6 @@ export const getTransaction = async (id: string): Promise<Transaction | null> =>
     
     return {
       ...data,
-      // Map supplier to vendor for UI consistency
-      vendor: data.supplier,
       // Ensure proper typing
       type: data.type as TransactionType,
       account: data.account as TreasuryAccount
@@ -57,19 +53,10 @@ export const getTransaction = async (id: string): Promise<Transaction | null> =>
 export const addTransaction = async (
   transaction: Omit<Transaction, 'id'>
 ): Promise<Transaction> => {
-  // Format data for insertion - Key fix: map vendor to supplier field
-  const dataToInsert = {
-    ...transaction,
-    // Map vendor to supplier for database storage
-    supplier: transaction.vendor,
-    // Remove vendor from the insert since it's not in the database schema
-    vendor: undefined
-  };
-  
   try {
     const { data, error } = await supabase
       .from('transactions')
-      .insert(dataToInsert)
+      .insert(transaction)
       .select()
       .single();
       
@@ -77,7 +64,6 @@ export const addTransaction = async (
     
     return {
       ...data,
-      vendor: data.supplier,
       type: data.type as TransactionType,
       account: data.account as TreasuryAccount
     };
@@ -92,19 +78,10 @@ export const updateTransaction = async (
   id: string,
   updates: Partial<Omit<Transaction, 'id'>>
 ): Promise<void> => {
-  // Format data for update - Key fix: map vendor to supplier field
-  const dataToUpdate = {
-    ...updates,
-    // Map vendor to supplier for database storage
-    ...(updates.vendor && { supplier: updates.vendor }),
-    // Remove vendor from the update since it's not in the database schema
-    vendor: undefined
-  };
-  
   try {
     const { error } = await supabase
       .from('transactions')
-      .update(dataToUpdate)
+      .update(updates)
       .eq('id', id);
       
     if (error) throw error;
