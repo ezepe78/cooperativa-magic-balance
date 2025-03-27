@@ -65,6 +65,7 @@ export type Database = {
           receipt: string | null
           type: string
           vendor: string | null
+          voucher_number: string | null
         }
         Insert: {
           account: string
@@ -79,6 +80,7 @@ export type Database = {
           receipt?: string | null
           type: string
           vendor?: string | null
+          voucher_number?: string | null
         }
         Update: {
           account?: string
@@ -93,6 +95,7 @@ export type Database = {
           receipt?: string | null
           type?: string
           vendor?: string | null
+          voucher_number?: string | null
         }
         Relationships: []
       }

@@ -54,13 +54,18 @@ export const addTransaction = async (
   transaction: Omit<Transaction, 'id'>
 ): Promise<Transaction> => {
   try {
+    console.log('Adding transaction:', transaction); // Debug log
+    
     const { data, error } = await supabase
       .from('transactions')
       .insert(transaction)
       .select()
       .single();
       
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
     
     return {
       ...data,
@@ -79,12 +84,17 @@ export const updateTransaction = async (
   updates: Partial<Omit<Transaction, 'id'>>
 ): Promise<void> => {
   try {
+    console.log('Updating transaction:', id, updates); // Debug log
+    
     const { error } = await supabase
       .from('transactions')
       .update(updates)
       .eq('id', id);
       
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
   } catch (error) {
     console.error('Error updating transaction:', error);
     throw error;
