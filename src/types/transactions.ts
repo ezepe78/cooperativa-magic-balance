@@ -19,4 +19,5 @@ export interface Transaction {
   type: TransactionType;
   vendor?: string;
   check_number?: string;
+  voucher_number?: string;  // New field for invoice/voucher number
 }

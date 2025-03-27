@@ -31,6 +31,7 @@ const EditTransaction = () => {
   const [description, setDescription] = useState<string>('');
   const [vendor, setVendor] = useState<string>('');
   const [checkNumber, setCheckNumber] = useState<string>('');
+  const [voucherNumber, setVoucherNumber] = useState<string>(''); // New state for voucher number
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -46,15 +47,35 @@ const EditTransaction = () => {
         setDescription(transaction.description);
         setVendor(transaction.vendor || '');
         setCheckNumber(transaction.check_number || '');
+        setVoucherNumber(transaction.voucher_number || ''); // Load voucher number if exists
       }
     }
   }, [id, transactions]);
 
   const filteredCategories = categories.filter(cat => cat.type === type);
 
+  // Voucher validation function
+  const validateVoucherNumber = (value: string): boolean => {
+    if (!value) return true; // Optional field
+    // Pattern: Starts with letters (FAC, FACT, FACB, etc.) followed by numbers, max 20 chars
+    const voucherPattern = /^[A-Z]{3,4}[0-9]{1,16}$/;
+    return value.length <= 20 && voucherPattern.test(value);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    // Validate voucher number if provided
+    if (voucherNumber && !validateVoucherNumber(voucherNumber)) {
+      toast({
+        title: "Error de formato",
+        description: "El número de comprobante debe comenzar con 3-4 letras seguidas de números (máx. 20 caracteres)",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       if (id) {
@@ -66,7 +87,8 @@ const EditTransaction = () => {
           date: date,
           description: description,
           vendor: vendor,
-          check_number: checkNumber
+          check_number: checkNumber,
+          voucher_number: voucherNumber // Include voucher number in the update
         });
 
         navigate('/');
@@ -190,6 +212,29 @@ const EditTransaction = () => {
                       value={vendor}
                       onChange={(e) => setVendor(e.target.value)}
                     />
+                  </div>
+                  
+                  {/* Número de Comprobante - Nuevo campo */}
+                  <div>
+                    <Label htmlFor="voucherNumber">
+                      Número de Comprobante (Opcional)
+                      <span className="text-xs text-muted-foreground ml-2">
+                        Ej: FACB0000123
+                      </span>
+                    </Label>
+                    <Input
+                      type="text"
+                      id="voucherNumber"
+                      placeholder="Ingrese el número de comprobante"
+                      value={voucherNumber}
+                      onChange={(e) => setVoucherNumber(e.target.value.toUpperCase())}
+                      maxLength={20}
+                    />
+                    {voucherNumber && !validateVoucherNumber(voucherNumber) && (
+                      <p className="text-sm text-destructive mt-1">
+                        Formato inválido. Debe comenzar con 3-4 letras seguidas de números (máx. 20 caracteres)
+                      </p>
+                    )}
                   </div>
                   
                   {/* Número de Cheque - Sexto campo (condicional) */}

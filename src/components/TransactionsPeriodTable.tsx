@@ -32,6 +32,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Receipt,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -150,7 +151,8 @@ const TransactionsPeriodTable = () => {
             isInPeriod &&
             (transaction.description.toLowerCase().includes(searchTermLower) ||
             getCategoryName(transaction.category_id).toLowerCase().includes(searchTermLower) ||
-            (transaction.vendor && transaction.vendor.toLowerCase().includes(searchTermLower)))
+            (transaction.vendor && transaction.vendor.toLowerCase().includes(searchTermLower)) ||
+            (transaction.voucher_number && transaction.voucher_number.toLowerCase().includes(searchTermLower)))
           );
         }
         
@@ -174,7 +176,7 @@ const TransactionsPeriodTable = () => {
   };
   
   const accountLabels: Record<string, string> = {
-    cash: 'Efectivo',
+    cash: 'Caja Chica',
     banco_provincia: 'Banco Provincia'
   };
 
@@ -335,7 +337,17 @@ const TransactionsPeriodTable = () => {
                   </TableCell>
                   <TableCell>{getCategoryName(transaction.category_id)}</TableCell>
                   <TableCell>{accountLabels[transaction.account]}</TableCell>
-                  <TableCell>{transaction.vendor || '-'}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span>{transaction.vendor || '-'}</span>
+                      {transaction.voucher_number && (
+                        <span className="text-xs text-muted-foreground flex items-center mt-1">
+                          <Receipt className="h-3 w-3 mr-1" />
+                          {transaction.voucher_number}
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>{transaction.description}</TableCell>
                   <TableCell className="text-right">
                     <span

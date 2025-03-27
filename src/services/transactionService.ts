@@ -57,11 +57,13 @@ export const getTransaction = async (id: string): Promise<Transaction | null> =>
 export const addTransaction = async (
   transaction: Omit<Transaction, 'id'>
 ): Promise<Transaction> => {
-  // Format data for insertion
+  // Format data for insertion - Key fix: map vendor to supplier field
   const dataToInsert = {
     ...transaction,
     // Map vendor to supplier for database storage
-    supplier: transaction.vendor
+    supplier: transaction.vendor,
+    // Remove vendor from the insert since it's not in the database schema
+    vendor: undefined
   };
   
   try {
@@ -90,11 +92,13 @@ export const updateTransaction = async (
   id: string,
   updates: Partial<Omit<Transaction, 'id'>>
 ): Promise<void> => {
-  // Format data for update
+  // Format data for update - Key fix: map vendor to supplier field
   const dataToUpdate = {
     ...updates,
-    // Map vendor to supplier if needed
-    ...(updates.vendor && { supplier: updates.vendor })
+    // Map vendor to supplier for database storage
+    ...(updates.vendor && { supplier: updates.vendor }),
+    // Remove vendor from the update since it's not in the database schema
+    vendor: undefined
   };
   
   try {
