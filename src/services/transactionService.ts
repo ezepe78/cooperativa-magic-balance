@@ -2,6 +2,19 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Transaction, TransactionType, TreasuryAccount } from '@/types/transactions';
 
+// Ensure account values match database constraints
+const formatAccountValue = (account: TreasuryAccount): string => {
+  // The database constraint expects specific values, ensure they match
+  switch (account) {
+    case 'banco_provincia':
+      return 'banco_provincia'; // Keep the same, but this is where we'd transform if needed
+    case 'cash':
+      return 'cash';
+    default:
+      return account;
+  }
+};
+
 // Fetch all transactions
 export const fetchTransactions = async (): Promise<Transaction[]> => {
   try {
@@ -56,9 +69,17 @@ export const addTransaction = async (
   try {
     console.log('Adding transaction:', transaction); // Debug log
     
+    // Format the account value to match database constraints
+    const formattedTransaction = {
+      ...transaction,
+      account: formatAccountValue(transaction.account)
+    };
+    
+    console.log('Formatted transaction:', formattedTransaction); // Debug log
+    
     const { data, error } = await supabase
       .from('transactions')
-      .insert(transaction)
+      .insert(formattedTransaction)
       .select()
       .single();
       
@@ -86,9 +107,17 @@ export const updateTransaction = async (
   try {
     console.log('Updating transaction:', id, updates); // Debug log
     
+    // Format the account value if it's being updated
+    const formattedUpdates = {
+      ...updates,
+      account: updates.account ? formatAccountValue(updates.account) : undefined
+    };
+    
+    console.log('Formatted updates:', formattedUpdates); // Debug log
+    
     const { error } = await supabase
       .from('transactions')
-      .update(updates)
+      .update(formattedUpdates)
       .eq('id', id);
       
     if (error) {
